@@ -17,6 +17,8 @@ LOCAL_APPS = [
     'taski.common.apps.CommonConfig',
     'taski.users.apps.UsersConfig',
     'taski.authentication.apps.AuthenticationConfig',
+    'taski.project.apps.ProjectConfig',
+    'taski.task.apps.TaskConfig',
 ]
 
 THIRD_PARTY_APPS = [
