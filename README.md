@@ -3,7 +3,7 @@
 - base model
 - custom user model
 - JWT authentication
-- slug field
+- slug field & pre-save signal
 
 
 ### Task :
