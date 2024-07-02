@@ -1,4 +1,11 @@
 # Task Test for Back-End Developer (Django)
+## additional options:
+- base model
+- custom user model
+- JWT authentication
+- slug field
+
+
 ### Task :
 Advanced Project Management Application with Microservices Architecture,
 Asynchronous Task Processing, and Real-Time Notifications
