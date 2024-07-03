@@ -19,9 +19,11 @@ LOCAL_APPS = [
     'taski.authentication.apps.AuthenticationConfig',
     'taski.project.apps.ProjectConfig',
     'taski.task.apps.TaskConfig',
+    'taski.ws.apps.WsConfig',
 ]
 
 THIRD_PARTY_APPS = [
+    'daphne',
     'rest_framework',
     'django_filters',
     'django_celery_results',
@@ -29,9 +31,11 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'drf_spectacular',
     'django_extensions',
+    'channels',
 ]
 
 INSTALLED_APPS = [
+    *THIRD_PARTY_APPS,
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +44,6 @@ INSTALLED_APPS = [
     # http://whitenoise.evans.io/en/stable/django.html#using-whitenoise-in-development
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
-    *THIRD_PARTY_APPS,
     *LOCAL_APPS,
 ]
 
@@ -164,5 +167,6 @@ from config.settings.jwt import *  # noqa
 from config.settings.sessions import *  # noqa
 from config.settings.celery import *  # noqa
 from config.settings.swagger import *  # noqa
+from config.settings.ws import * # noqa
 # from config.settings.sentry import *  # noqa
 # from config.settings.email_sending import *  # noqa
