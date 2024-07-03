@@ -3,10 +3,12 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
 from taski.api.serializers import NotFoundResponseSerializer, BadRequestResponseSerializer
-from taski.task.models import Task
-from taski.task.serialziers import TaskOutPutSerializer, TaskInputSerializer
+from taski.task.models import Task, Comment
+from taski.task.serialziers import TaskOutPutSerializer, TaskInputSerializer, CommentInputSerializer, \
+    CommentOutPutSerializer
 
 
 class TaskAPIView(
@@ -96,3 +98,37 @@ class SingleTaskAPIView(
         task = self.get_object()
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentAPIView(
+    APIView,
+):
+    @extend_schema(
+        tags=['comment-task'],
+        summary='Add a comment to a task',
+        request=CommentInputSerializer(),
+        responses={
+            201: CommentOutPutSerializer,
+            400: BadRequestResponseSerializer,
+        },
+    )
+    def post(self, request, id, *args, **kwargs):
+        serializer = CommentInputSerializer(data=request.data, context={'task': id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            CommentOutPutSerializer(serializer.instance).data,
+            status=status.HTTP_201_CREATED
+        )
+
+    @extend_schema(
+        tags=['comment-task'],
+        summary='List all comments for a task',
+        responses={
+            200: CommentOutPutSerializer,
+        },
+    )
+    def get(self, request, id, *args, **kwargs):
+        queryset = Comment.objects.filter(task__id=id)
+        serializer = CommentOutPutSerializer(queryset, many=True)
+        return Response(serializer.data)
