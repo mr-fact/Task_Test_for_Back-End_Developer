@@ -28,7 +28,7 @@ class TaskAPIView(
     @extend_schema(
         tags=['task'],
         request=TaskInputSerializer(),
-        responses=TaskInputSerializer(),
+        responses=TaskOutPutSerializer(),
     )
     def post(self, request, *args, **kwargs):
         serializer = TaskInputSerializer(data=request.data)
@@ -42,3 +42,38 @@ class TaskAPIView(
             return {'Location': str(data[api_settings.URL_FIELD_NAME])}
         except (TypeError, KeyError):
             return {}
+
+
+class SingleTaskAPIView(
+    GenericAPIView,
+):
+    queryset = Task.objects.all()
+    lookup_field = 'id'
+
+    @extend_schema(
+        tags=['task'],
+        responses=TaskOutPutSerializer(),
+    )
+    def get(self, request, id, *args, **kwargs):
+        task = self.get_object()
+        return Response(TaskOutPutSerializer(task).data)
+
+    @extend_schema(
+        tags=['task'],
+        request=TaskInputSerializer(),
+        responses=TaskOutPutSerializer(),
+    )
+    def put(self, request, id, *args, **kwargs):
+        task = self.get_object()
+        serializer = TaskInputSerializer(instance=task, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(TaskOutPutSerializer(task).data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        tags=['task'],
+    )
+    def delete(self, request, id, *args, **kwargs):
+        task = self.get_object()
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
