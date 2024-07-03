@@ -4,6 +4,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
+from taski.api.serializers import NotFoundResponseSerializer, BadRequestResponseSerializer
 from taski.task.models import Task
 from taski.task.serialziers import TaskOutPutSerializer, TaskInputSerializer
 
@@ -13,6 +14,7 @@ class TaskAPIView(
 ):
     @extend_schema(
         tags=['task'],
+        summary='List all tasks',
         responses=TaskOutPutSerializer(many=True),
     )
     def get(self, request, *args, **kwargs):
@@ -27,8 +29,12 @@ class TaskAPIView(
 
     @extend_schema(
         tags=['task'],
+        summary='Create new task',
         request=TaskInputSerializer(),
-        responses=TaskOutPutSerializer(),
+        responses={
+            200: TaskOutPutSerializer,
+            400: BadRequestResponseSerializer,
+        },
     )
     def post(self, request, *args, **kwargs):
         serializer = TaskInputSerializer(data=request.data)
@@ -52,7 +58,11 @@ class SingleTaskAPIView(
 
     @extend_schema(
         tags=['task'],
-        responses=TaskOutPutSerializer(),
+        summary='Retrieve a single task by ID',
+        responses={
+            200: TaskOutPutSerializer,
+            404: NotFoundResponseSerializer,
+        },
     )
     def get(self, request, id, *args, **kwargs):
         task = self.get_object()
@@ -60,8 +70,12 @@ class SingleTaskAPIView(
 
     @extend_schema(
         tags=['task'],
+        summary='Update a task by ID',
         request=TaskInputSerializer(),
-        responses=TaskOutPutSerializer(),
+        responses={
+            200: TaskOutPutSerializer,
+            404: NotFoundResponseSerializer,
+        },
     )
     def put(self, request, id, *args, **kwargs):
         task = self.get_object()
@@ -72,6 +86,11 @@ class SingleTaskAPIView(
 
     @extend_schema(
         tags=['task'],
+        summary='Delete a task by ID',
+        responses={
+            204: None,
+            404: NotFoundResponseSerializer,
+        }
     )
     def delete(self, request, id, *args, **kwargs):
         task = self.get_object()
