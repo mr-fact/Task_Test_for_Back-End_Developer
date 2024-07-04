@@ -9,7 +9,9 @@ class WebSocketInfoAPIView(
     @extend_schema(
         tags=['WebSocket'],
         summary='web socket connection info',
-        description='WebSocket connection established at ws://localhost:8000/ws/myapp/',
+        description='''
+        This API endpoint provides information about the WebSocket connection.
+        Connect to the WebSocket at: `ws://localhost:8000/ws/notifications/`''',
     )
     def get(self, request):
-        return Response({"info": "WebSocket connection established at ws://localhost:8000/ws/myapp/"})
+        return Response({"info": "WebSocket connection established at ws://localhost:8000/ws/notifications/"})
