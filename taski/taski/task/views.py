@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
@@ -20,14 +21,21 @@ class TaskAPIView(
         responses=TaskOutPutSerializer(many=True),
     )
     def get(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(Task.objects.all())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = TaskOutPutSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        data = self.get_all_from_cache()
+        if not data:
+            data = self.get_all_from_db()
+        return Response(data)
 
+    def get_all_from_cache(self):
+        data = cache.get('all_tasks')
+        return data
+
+    def get_all_from_db(self):
+        queryset = Task.objects.all()
         serializer = TaskOutPutSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = serializer.data
+        cache.set('all_tasks', data, 600)  # 10 min / 600 sec
+        return data
 
     @extend_schema(
         tags=['task'],
@@ -43,6 +51,7 @@ class TaskAPIView(
         serializer.is_valid(raise_exception=True)
         serializer.save()
         headers = self.get_success_headers(serializer.data)
+        cache.delete('all_tasks')
         return Response(TaskOutPutSerializer(serializer.instance).data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_success_headers(self, data):
